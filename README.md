@@ -28,9 +28,6 @@ This study investigates the differences in salivary microbiome composition and f
 - [Installation & Usage](#installation--usage)
 - [Data Availability](#data-availability)
 - [Main Findings](#main-findings)
-- [Figures & Tables](#figures--tables)
-- [References](#references)
-- [Contributing](#contributing)
 - [License](#license)
 
 ---
@@ -98,18 +95,17 @@ Alzheimer’s disease (AD) is the most common cause of dementia, affecting over 
 
 3. **Data Preparation:**
    - Download raw data from [NCBI SRA PRJNA770746](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA770746).
-   - Process data as per the scripts in the `pipeline/` directory.
+   - Process data as per the scripts.
 
 4. **Run Analysis:**
-   - Use the main pipeline script for taxonomic, diversity, and machine learning analyses.
-   - See the `notebooks/` directory for step-by-step Jupyter notebooks.
+   - Use the main pipeline script (o1_automated_analysis_scripts) for taxonomic, diversity, and machine learning analyses.
 
 ---
 
 ## Data Availability
 
 - **Primary Dataset:** [NCBI SRA PRJNA770746](https://www.ncbi.nlm.nih.gov/bioproject/PRJNA770746)
-- **Processed Data & Metadata:** See `data/` and Supplementary files (1A, 1B, 2A, 2B).
+- **Processed Data & Metadata:** See Supplementary files (1A, 1B, 2A, 2B) in main publication.
 
 ---
 
@@ -119,23 +115,6 @@ Alzheimer’s disease (AD) is the most common cause of dementia, affecting over 
 - Distinct taxonomic (e.g., increased *Taylorella asinigenitalis*) and functional (e.g., reduced glycolysis) signatures differentiate AD from controls.
 - Machine learning models based on microbiome features achieve diagnostic accuracy comparable to current clinical standards.
 - AD is associated with increased oral microbial diversity, metabolic inflexibility, and fragmented microbial community structure.
-
----
-
-## Figures & Tables
-
-Key figures and tables illustrating diversity metrics, taxonomic heatmaps, functional pathway analyses, and machine learning performance are available in the `figures/` directory and in the main manuscript.
-
----
-
-## References
-
-A comprehensive list of references supporting the methodology, results, and discussion is provided in the [REFERENCES.md](REFERENCES.md) file and the main manuscript. Key references include:
-
-- Adil et al., 2025. Microorganisms, 13(4), 814. [doi:10.3390/microorganisms13040814](https://doi.org/10.3390/microorganisms13040814)
-- Baker et al., 2021. Genome Res, 31(1), 64–74. [doi:10.1101/gr.265645.120](https://doi.org/10.1101/gr.265645.120)
-- Batra et al., 2023. Alzheimers Dement, 19(3), 980–998. [doi:10.1002/alz.12714](https://doi.org/10.1002/alz.12714)
-- See the full reference list in the manuscript.
 
 ---
 
@@ -155,14 +134,4 @@ This project is licensed under the MIT License. See the [LICENSE](LICENSE) file 
 
 **Corresponding Author:**  
 Edward Jenner Tettevi  
-Department of Biochemistry, Cell and Molecular Biology, University of Ghana  
 Email: ejtettevi@gmail.com
-
----
-
-## Acknowledgements
-
-- Data and analysis scripts are made available in the spirit of open science.
-- No competing interests or funding to declare.
-
----
