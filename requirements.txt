@@ -1,0 +1,12 @@
+numpy
+pandas
+matplotlib
+seaborn
+scipy
+scikit-learn
+networkx
+scikit-bio
+umap-learn
+statsmodels
+# Pathway-Tools integration (optional)
+# ptools  # Uncomment if Pathway-Tools Python API is available
