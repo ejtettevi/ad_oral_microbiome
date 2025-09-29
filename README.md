@@ -1,8 +1,4 @@
-Okay
-,
-
-
-# **GitHub README: Oral Microbiome Dysbiosis in Alzheimer’s Disease: A Comprehensive Analysis**
+Oral Microbiome Dysbiosis in Alzheimer’s Disease: A Comprehensive Analysis**
 
 ---
 
@@ -80,27 +76,8 @@ This study integrates high-resolution taxonomic, ecological, and predicted funct
 
 ---
 
-## **6. References**
-
-1. Anderson, M. J. (2017). *Permutational Multivariate Analysis of Variance (PERMANOVA)*. 1–15.
-2. Benjamini, Y., & Hochberg, Y. (1995). Controlling the false discovery rate: A practical and powerful approach to multiple testing. *The Journal of the Royal Statistical Society, Series B* (Statistical Methodology), 57(1), 289–300.
-3. Bradley, A. (1997). *The use of the area under the ROC curve in the evaluation of machine learning algorithms*. *Pattern Recognition*, 30(1145–1159).
-4. Callahan, B., McMurdie, P. J., Rosen, M. J., Han, A. W., Johnson, A. J., & Holmes, S. (2016). *DADA2: High resolution sample inference from Illumina amplicon data*. *Nature Methods*, 13(581–583).
-5. Caspi, R., Billington, R., Keseler, I. M., Kothari, A., Krummenacker, M., Midford, P. E., Ong, W. K., Paley, S., Subhraveti, P., & Karp, P. D. (2020). *The MetaCyc database of metabolic pathways and enzymes - a 2019 update*. *Nucleic Acids Research*, 48(D1), D445–D453.
-6. Chen, S. (2023). *Ultrafast one-pass FASTQ data preprocessing, quality control, and deduplication using fastp*. *Imeta*, 2(2), e107.
-7. Chen, S., Zhou, Y., Chen, Y., & Gu, J. (2018). *fastp: An ultra-fast all-in-one FASTQ preprocessor*. *Bioinformatics*, 34(17), i884–i890.
-8. Dixon, P. (2003). *VEgan: A package of R functions for community ecology*. *14*, 927–930.
-9. Long, H., Yan, L., Pu, J., Liu, Y., Zhong, X., & Wang…, H. (2022a). *Multi-omics analysis reveals the effects of microbiota on oral homeostasis*. *Frontiers in …*. https://doi.org/10.3389/fimmu.2022.1005992/pdf
-10. Long, H., Yan, L., Pu, J., Liu, Y., Zhong, X., Wang, H., Yang, L., Lou, F., Luo, S., Zhang, Y., Liu, Y., Xie, P., Ji, P., & Jin, X. (2022b). *Multi-omics analysis reveals the effects of microbiota on oral homeostasis*. *Frontiers in Immunology*. https://doi.org/10.3389/fimmu.2022.1005992
-
----
-
-## **7. Acknowledgments**
+## **6. Acknowledgments**
 
 - **Authors**: Edward Jenner Tettevi, Samuel Armoo, David Larbi Simpong, Mike Y. Osei - Atweneboana.
-- **Data**: Available on GitHub: [https://github.com/ejtettevi/ad_oral_microbiome](https://github.com/ejtettevi/ad_oral_microbiome)
 - **Contact**: Correspondence to: Edward Jenner Tettevi, ejtettevi@gmail.com
 
---- 
-
-This README provides a comprehensive overview of the study, highlighting its methodology, results, and implications for understanding oral microbiome dysbiosis in AD.
