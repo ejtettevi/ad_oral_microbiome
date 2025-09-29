@@ -1,0 +1,30 @@
+name: oral_microbiome_analysis
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.10
+  - r-base=4.3
+  - r-dada2
+  - r-phyloseq
+  - r-tax4fun2
+  - r-decontam
+  - r-vegan
+  - r-ggplot2
+  - r-pheatmap
+  - r-viridis
+  - fastp
+  - cutadapt
+  - bbmap
+  - bowtie2
+  - samtools
+  - multiqc
+  - scikit-bio
+  - scikit-learn
+  - pandas
+  - seaborn
+  - matplotlib
+  - statsmodels
+  - ancombc
+  - aldex2
