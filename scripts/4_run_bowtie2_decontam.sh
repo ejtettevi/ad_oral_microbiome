@@ -1,5 +1,5 @@
 #!/bin/bash
-# run_bowtie2_decontam_improved.sh
+# run_bowtie2_decontam.sh
 set -euo pipefail
 set -x
 
