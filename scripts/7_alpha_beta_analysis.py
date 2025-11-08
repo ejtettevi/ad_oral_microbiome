@@ -161,23 +161,77 @@ for metric in ['Observed', 'Chao1', 'Shannon', 'Simpson', 'Fisher']:
         pval = np.nan
 
     if pval < 0.05:
-        fig, ax = plt.subplots(figsize=(7, 5))
-        sns.violinplot(
-            x='Group', y=metric, data=alpha_div_df,
-            palette=group_colors, inner='box', linewidth=2, ax=ax
-        )
-        add_pval_text_boxplot(ax, pval, n_groups=len(groups))
-        ax.set_title(f"{metric} Diversity by Group (Violin)", fontsize=16, fontweight='bold')
+        fig, ax = plt.subplots(figsize=(8, 6))
+        
+        # Create violin plot with better styling
+        violin_parts = ax.violinplot([vals[i] for i in range(len(groups))], 
+                                   positions=range(len(groups)), 
+                                   widths=0.6, showmeans=True, showmedians=True)
+        
+        # Color the violin plots
+        for i, pc in enumerate(violin_parts['bodies']):
+            pc.set_facecolor(list(group_colors.values())[i])
+            pc.set_alpha(0.7)
+            pc.set_edgecolor('black')
+            pc.set_linewidth(1.5)
+        
+        # Style the means and medians
+        violin_parts['cmeans'].set_color('red')
+        violin_parts['cmeans'].set_linewidth(2)
+        violin_parts['cmedians'].set_color('darkred')
+        violin_parts['cmedians'].set_linewidth(2)
+        
+        # Add individual data points with jitter
+        for i, group in enumerate(groups):
+            group_data = alpha_div_df.loc[alpha_div_df['Group'] == group, metric].dropna()
+            x_jitter = np.random.normal(i, 0.1, len(group_data))
+            ax.scatter(x_jitter, group_data, alpha=0.6, s=30, 
+                      color=list(group_colors.values())[i], edgecolors='black', linewidth=0.5)
+        
+        # Add significance annotation with better positioning
+        y_max = max([max(v) for v in vals if len(v) > 0])
+        y_min = min([min(v) for v in vals if len(v) > 0])
+        y_range = y_max - y_min
+        y_text = y_max + 0.05 * y_range
+        
+        if pval < 0.001:
+            pval_str = "p < 0.001 ***"
+        elif pval < 0.01:
+            pval_str = f"p = {pval:.3f} **"
+        elif pval < 0.05:
+            pval_str = f"p = {pval:.3f} *"
+        else:
+            pval_str = f"p = {pval:.3f}"
+        
+        ax.text(len(groups)/2 - 0.5, y_text, pval_str, ha='center', va='bottom', 
+                fontsize=14, fontweight='bold', bbox=dict(boxstyle='round,pad=0.3', 
+                facecolor='white', edgecolor='black', alpha=0.8))
+        
+        # Set labels and title with better spacing
+        ax.set_title(f"{metric} Diversity by Group", fontsize=18, fontweight='bold', pad=20)
         ax.set_xlabel("Group", fontsize=16, fontweight='bold')
         ax.set_ylabel(f"{metric} Diversity", fontsize=16, fontweight='bold')
-        ax.tick_params(axis='both', labelsize=14)
+        ax.set_xticks(range(len(groups)))
+        ax.set_xticklabels(groups, fontsize=14)
+        ax.tick_params(axis='y', labelsize=12)
+        
+        # Add grid for better readability
+        ax.grid(True, alpha=0.3, axis='y')
+        ax.set_axisbelow(True)
+        
+        # Create legend with better positioning
         handles = [
-            plt.Line2D([0], [0], color=group_colors[g], lw=8, label=g)
+            plt.Line2D([0], [0], color=group_colors[g], lw=6, label=g)
             for g in sorted(alpha_div_df['Group'].unique())
         ]
-        ax.legend(handles=handles, title="Group", loc='best', frameon=True)
+        ax.legend(handles=handles, title="Group", loc='upper right', 
+                 frameon=True, fancybox=True, shadow=True, fontsize=12)
+        
+        # Adjust layout to prevent label overlap
         plt.tight_layout()
-        plt.savefig(f"{output_dir}/{metric.lower()}_diversity_violin_colorblind.png", dpi=700, bbox_inches='tight')
+        plt.subplots_adjust(top=0.9)
+        plt.savefig(f"{output_dir}/{metric.lower()}_diversity_violin_colorblind.png", 
+                   dpi=700, bbox_inches='tight', facecolor='white')
         plt.close()
 
 # --- Beta Diversity Analyses ---
@@ -279,24 +333,62 @@ for name, df in ordination_dfs.items():
     betadisper_p = betadisper_bray if name == 'bray_curtis' else betadisper_jaccard
     if df is not None and pval is not None and pval < 0.05:
         axes = [col for col in df.columns if col not in ['Group']]
-        fig, ax = plt.subplots(figsize=(7, 6))
+        fig, ax = plt.subplots(figsize=(10, 8))
+        
+        # Create scatter plot with better styling
         for group, color in group_colors.items():
             sub = df[df['Group'] == group]
-            ax.scatter(sub[axes[0]], sub[axes[1]], label=group, color=color, s=80, edgecolor='k', alpha=0.85)
+            ax.scatter(sub[axes[0]], sub[axes[1]], label=group, color=color, 
+                      s=120, edgecolor='black', alpha=0.8, linewidth=1.5)
+        
+        # Add confidence ellipses for each group
+        from matplotlib.patches import Ellipse
+        for group, color in group_colors.items():
+            sub = df[df['Group'] == group]
+            if len(sub) > 2:  # Need at least 3 points for ellipse
+                # Calculate ellipse parameters
+                x_mean, y_mean = sub[axes[0]].mean(), sub[axes[1]].mean()
+                x_std, y_std = sub[axes[0]].std(), sub[axes[1]].std()
+                
+                # Create ellipse
+                ellipse = Ellipse((x_mean, y_mean), 2*x_std, 2*y_std, 
+                                alpha=0.2, facecolor=color, edgecolor=color, linewidth=2)
+                ax.add_patch(ellipse)
+        
         explained_var = ordination_results[name].proportion_explained[:2] * 100
-        title = f"PCoA ({name.replace('_', ' ').title()})\nAxis 1: {explained_var[0]:.1f}%, Axis 2: {explained_var[1]:.1f}%"
-        title += f"\nPERMANOVA p={pval:.3g}, Betadisper p={betadisper_p:.3g}"
-        ax.set_title(title, fontsize=16, fontweight='bold')
-        ax.set_xlabel(axes[0], fontsize=16, fontweight='bold')
-        ax.set_ylabel(axes[1], fontsize=16, fontweight='bold')
-        ax.tick_params(axis='both', labelsize=14)
-        ax.grid(False)
-        leg = ax.legend(title="Group", loc='center left', bbox_to_anchor=(1, 0.5), frameon=True, markerscale=1.2)
+        
+        # Create better title with improved formatting
+        title = f"PCoA ({name.replace('_', ' ').title()})\n"
+        title += f"Axis 1: {explained_var[0]:.1f}% variance explained, "
+        title += f"Axis 2: {explained_var[1]:.1f}% variance explained\n"
+        title += f"PERMANOVA p={pval:.3g}, Betadisper p={betadisper_p:.3g}"
+        
+        ax.set_title(title, fontsize=16, fontweight='bold', pad=20)
+        ax.set_xlabel(f"{axes[0]} ({explained_var[0]:.1f}%)", fontsize=14, fontweight='bold')
+        ax.set_ylabel(f"{axes[1]} ({explained_var[1]:.1f}%)", fontsize=14, fontweight='bold')
+        ax.tick_params(axis='both', labelsize=12)
+        
+        # Add grid for better readability
+        ax.grid(True, alpha=0.3)
+        ax.set_axisbelow(True)
+        
+        # Create legend with better positioning and styling
+        leg = ax.legend(title="Group", loc='center left', bbox_to_anchor=(1, 0.5), 
+                      frameon=True, fancybox=True, shadow=True, markerscale=1.5)
         leg.set_title("Group", prop={'size': 14, 'weight': 'bold'})
         for text in leg.get_texts():
-            text.set_fontsize(14)
+            text.set_fontsize(12)
+        
+        # Add sample count annotation
+        sample_counts = df['Group'].value_counts()
+        count_text = "Sample counts:\n" + "\n".join([f"{group}: {count}" for group, count in sample_counts.items()])
+        ax.text(0.02, 0.98, count_text, transform=ax.transAxes, fontsize=10,
+                verticalalignment='top', bbox=dict(boxstyle='round,pad=0.5', 
+                facecolor='white', edgecolor='black', alpha=0.8))
+        
         plt.tight_layout()
-        plt.savefig(f"{output_dir}/{name}_pcoa_plot_colorblind.png", dpi=700, bbox_inches='tight')
+        plt.savefig(f"{output_dir}/{name}_pcoa_plot_colorblind.png", 
+                   dpi=700, bbox_inches='tight', facecolor='white')
         plt.close()
 
 # NMDS plots
@@ -308,22 +400,59 @@ for name, (df, stress) in nmds_dfs.items():
     pval = permanova_results[name]
     betadisper_p = betadisper_bray if name == 'bray_curtis' else betadisper_jaccard
     if df is not None and pval is not None and pval < 0.05:
-        fig, ax = plt.subplots(figsize=(7, 6))
+        fig, ax = plt.subplots(figsize=(10, 8))
+        
+        # Create scatter plot with better styling
         for group, color in group_colors.items():
             sub = df[df['Group'] == group]
-            ax.scatter(sub['NMDS1'], sub['NMDS2'], label=group, color=color, s=80, edgecolor='k', alpha=0.85)
-        title = f"NMDS ({name.replace('_', ' ').title()})\nStress: {stress:.4f}\nPERMANOVA p={pval:.3g}, Betadisper p={betadisper_p:.3g}"
-        ax.set_title(title, fontsize=16, fontweight='bold')
-        ax.set_xlabel("NMDS1", fontsize=16, fontweight='bold')
-        ax.set_ylabel("NMDS2", fontsize=16, fontweight='bold')
-        ax.tick_params(axis='both', labelsize=14)
-        ax.grid(False)
-        leg = ax.legend(title="Group", loc='center left', bbox_to_anchor=(1, 0.5), frameon=True, markerscale=1.2)
+            ax.scatter(sub['NMDS1'], sub['NMDS2'], label=group, color=color, 
+                      s=120, edgecolor='black', alpha=0.8, linewidth=1.5)
+        
+        # Add confidence ellipses for each group
+        from matplotlib.patches import Ellipse
+        for group, color in group_colors.items():
+            sub = df[df['Group'] == group]
+            if len(sub) > 2:  # Need at least 3 points for ellipse
+                # Calculate ellipse parameters
+                x_mean, y_mean = sub['NMDS1'].mean(), sub['NMDS2'].mean()
+                x_std, y_std = sub['NMDS1'].std(), sub['NMDS2'].std()
+                
+                # Create ellipse
+                ellipse = Ellipse((x_mean, y_mean), 2*x_std, 2*y_std, 
+                                alpha=0.2, facecolor=color, edgecolor=color, linewidth=2)
+                ax.add_patch(ellipse)
+        
+        # Create better title with improved formatting
+        title = f"NMDS ({name.replace('_', ' ').title()})\n"
+        title += f"Stress: {stress:.4f}\n"
+        title += f"PERMANOVA p={pval:.3g}, Betadisper p={betadisper_p:.3g}"
+        
+        ax.set_title(title, fontsize=16, fontweight='bold', pad=20)
+        ax.set_xlabel("NMDS1", fontsize=14, fontweight='bold')
+        ax.set_ylabel("NMDS2", fontsize=14, fontweight='bold')
+        ax.tick_params(axis='both', labelsize=12)
+        
+        # Add grid for better readability
+        ax.grid(True, alpha=0.3)
+        ax.set_axisbelow(True)
+        
+        # Create legend with better positioning and styling
+        leg = ax.legend(title="Group", loc='center left', bbox_to_anchor=(1, 0.5), 
+                      frameon=True, fancybox=True, shadow=True, markerscale=1.5)
         leg.set_title("Group", prop={'size': 14, 'weight': 'bold'})
         for text in leg.get_texts():
-            text.set_fontsize(14)
+            text.set_fontsize(12)
+        
+        # Add sample count annotation
+        sample_counts = df['Group'].value_counts()
+        count_text = "Sample counts:\n" + "\n".join([f"{group}: {count}" for group, count in sample_counts.items()])
+        ax.text(0.02, 0.98, count_text, transform=ax.transAxes, fontsize=10,
+                verticalalignment='top', bbox=dict(boxstyle='round,pad=0.5', 
+                facecolor='white', edgecolor='black', alpha=0.8))
+        
         plt.tight_layout()
-        plt.savefig(f"{output_dir}/{name}_nmds_plot_colorblind.png", dpi=700, bbox_inches='tight')
+        plt.savefig(f"{output_dir}/{name}_nmds_plot_colorblind.png", 
+                   dpi=700, bbox_inches='tight', facecolor='white')
         plt.close()
 
 # --- Differential Abundance Analysis (Wilcoxon rank-sum, FDR correction, volcano plot) ---
@@ -347,28 +476,81 @@ if len(alpha_div_df['Group'].unique()) == 2:
     results_df.to_csv(f"{output_dir}/differential_abundance_wilcoxon.csv", index=False)
     print("Differential abundance analysis complete (Wilcoxon, for sensitivity only).")
 
-    # Volcano plot (colorblind, robust to group count)
+    # Enhanced Volcano plot (colorblind, robust to group count)
     sig = (results_df['padj'] < 0.05)
-    fig, ax = plt.subplots(figsize=(8, 6))
-    sig_color = palette[0]
-    nonsig_color = palette[1] if len(palette) > 1 else "#cccccc"
-    ax.scatter(
-        results_df['log2FC'], -np.log10(results_df['padj']),
-        c=[sig_color if s else nonsig_color for s in sig], s=30, alpha=0.8, edgecolor='none', label=None
-    )
-    ax.set_xlabel('log2 Fold Change', fontsize=16, fontweight='bold')
-    ax.set_ylabel('-log10 Adjusted p-value', fontsize=16, fontweight='bold')
-    ax.set_title('Differential Abundance Volcano Plot (Wilcoxon, FDR)', fontsize=18, fontweight='bold')
-    ax.axhline(-np.log10(0.05), color='black', linestyle='--', linewidth=1.5, label='FDR=0.05')
+    fig, ax = plt.subplots(figsize=(10, 8))
+    
+    # Define colors for different significance levels
+    colors = []
+    sizes = []
+    for idx, row in results_df.iterrows():
+        if row['padj'] < 0.001:
+            colors.append('#d62728')  # Dark red for highly significant
+            sizes.append(80)
+        elif row['padj'] < 0.01:
+            colors.append('#ff7f0e')  # Orange for very significant
+            sizes.append(60)
+        elif row['padj'] < 0.05:
+            colors.append('#2ca02c')  # Green for significant
+            sizes.append(40)
+        else:
+            colors.append('#cccccc')  # Gray for non-significant
+            sizes.append(20)
+    
+    # Create scatter plot with varying sizes and colors
+    scatter = ax.scatter(results_df['log2FC'], -np.log10(results_df['padj']),
+                        c=colors, s=sizes, alpha=0.7, edgecolors='black', linewidth=0.5)
+    
+    # Add significance threshold lines
+    ax.axhline(-np.log10(0.05), color='black', linestyle='--', linewidth=2, alpha=0.7, label='FDR = 0.05')
+    ax.axhline(-np.log10(0.01), color='black', linestyle=':', linewidth=1.5, alpha=0.7, label='FDR = 0.01')
+    ax.axvline(0, color='black', linestyle='-', linewidth=1, alpha=0.5)
+    
+    # Add labels for top significant points to avoid overlap
+    top_significant = results_df[results_df['padj'] < 0.05].nsmallest(10, 'padj')
+    for idx, row in top_significant.iterrows():
+        ax.annotate(f"{row['ASV'][:8]}...", 
+                   (row['log2FC'], -np.log10(row['padj'])),
+                   xytext=(5, 5), textcoords='offset points',
+                   fontsize=8, alpha=0.8,
+                   bbox=dict(boxstyle='round,pad=0.2', facecolor='white', 
+                            edgecolor='black', alpha=0.7))
+    
+    # Enhanced labels and title
+    ax.set_xlabel('log₂ Fold Change', fontsize=16, fontweight='bold')
+    ax.set_ylabel('-log₁₀ Adjusted p-value', fontsize=16, fontweight='bold')
+    ax.set_title('Differential Abundance Volcano Plot\n(Wilcoxon Rank-Sum Test with FDR Correction)', 
+                fontsize=18, fontweight='bold', pad=20)
+    
+    # Add grid for better readability
+    ax.grid(True, alpha=0.3)
+    ax.set_axisbelow(True)
+    
+    # Create enhanced legend
     from matplotlib.patches import Patch
     legend_elements = [
-        Patch(facecolor=sig_color, edgecolor='none', label='Significant (FDR<0.05)'),
-        Patch(facecolor=nonsig_color, edgecolor='none', label='Not Significant'),
-        Patch(facecolor='white', edgecolor='black', linestyle='--', label='FDR=0.05')
+        Patch(facecolor='#d62728', label='p < 0.001 (***)'),
+        Patch(facecolor='#ff7f0e', label='p < 0.01 (**)'),
+        Patch(facecolor='#2ca02c', label='p < 0.05 (*)'),
+        Patch(facecolor='#cccccc', label='p ≥ 0.05 (ns)'),
+        plt.Line2D([0], [0], color='black', linestyle='--', label='FDR = 0.05'),
+        plt.Line2D([0], [0], color='black', linestyle=':', label='FDR = 0.01')
     ]
-    ax.legend(handles=legend_elements[:2], loc='best', frameon=True)
+    
+    ax.legend(handles=legend_elements, loc='upper right', frameon=True, 
+             fancybox=True, shadow=True, fontsize=12)
+    
+    # Add statistics annotation
+    n_sig = sig.sum()
+    n_total = len(results_df)
+    stats_text = f"Total ASVs: {n_total}\nSignificant: {n_sig} ({n_sig/n_total*100:.1f}%)"
+    ax.text(0.02, 0.98, stats_text, transform=ax.transAxes, fontsize=12,
+            verticalalignment='top', bbox=dict(boxstyle='round,pad=0.5', 
+            facecolor='white', edgecolor='black', alpha=0.8))
+    
     plt.tight_layout()
-    plt.savefig(f"{output_dir}/differential_abundance_volcano_colorblind.png", dpi=700, bbox_inches='tight')
+    plt.savefig(f"{output_dir}/differential_abundance_volcano_colorblind.png", 
+               dpi=700, bbox_inches='tight', facecolor='white')
     plt.close()
 
 # --- Save environment info for reproducibility ---
