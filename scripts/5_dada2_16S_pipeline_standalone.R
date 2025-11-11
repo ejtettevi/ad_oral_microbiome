@@ -1,4 +1,4 @@
-# scripts/dada2_16S_pipeline_standalone.R
+# dada2_16S_pipeline_standalone.R
 
 suppressPackageStartupMessages({
   library(dada2)

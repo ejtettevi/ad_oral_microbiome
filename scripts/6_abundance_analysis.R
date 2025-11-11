@@ -1,9 +1,4 @@
-# comprehensive_oral_microbiome_analysis.R
-
-# Comprehensive Oral Microbiome Analysis Script
-# Author: [Your Name]
-# Date: [Current Date]
-
+# abundance_analysis.R
 suppressPackageStartupMessages({
   library(phyloseq)
   library(DESeq2)
