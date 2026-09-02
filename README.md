@@ -154,7 +154,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 If you use this code or data, please cite:
 
 ```
-Tettevi, E.J., Armoo, S., Simpong, D.L., Osei-Atweneboana, M.Y. (2024).
+Tettevi, E.J., Simpong, D.L., Biney, R.P., Osei-Atweneboana, M.Y. (2026).
 Oral Microbiome Dysbiosis Characterizes Alzheimer's Disease: Integrated Taxonomic,
 Functional, and Machine Learning Insights from a Vancouver Cohort.
 The Microbe.
