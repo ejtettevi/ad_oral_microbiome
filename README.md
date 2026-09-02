@@ -117,7 +117,9 @@ ad_oral_microbiome/
 ├── requirements.txt           Python dependencies
 ├── sample_metadata.csv        Sample metadata for all runs
 │
-├── scripts/                   # Fully commented, numbered pipeline
+├── scripts/                   # All 36 analysis scripts used
+│   │
+│   │  Core pipeline (numbered)
 │   ├── 1_download_sra_data.sh
 │   ├── 2_run_fastp_automatic.sh
 │   ├── 3_run_cutadapt_v3v4.sh
@@ -126,7 +128,44 @@ ad_oral_microbiome/
 │   ├── 6_abundance_analysis.R
 │   ├── 7_alpha_beta_analysis.py
 │   ├── 8_microbiome_ml.py
-│   └── 9_picrust.py
+│   ├── 9_picrust.py
+│   ├── 10_pathway-tools.py
+│   │
+│   │  Fecal processing
+│   ├── download_and_process_fecal.sh
+│   ├── process_fecal_samples.R
+│   ├── process_fecal_batch.R
+│   ├── fecal_analysis_status.R
+│   ├── fecal_dada2_analysis.R
+│   ├── fecal_dada2_simple.R
+│   ├── combined_analysis.R
+│   │
+│   │  (Batch) improved analyses
+│   ├── analyze_sample_selection.R
+│   ├── identify_excluded_samples.R
+│   ├── run_improved_analysis.R
+│   ├── improved_analysis_clean.R
+│   ├── improved_analysis_final.R
+│   ├── improved_analysis_v2.R
+│   ├── improved_differential_analysis.R
+│   ├── improved_visualization.R
+│   ├── full_analysis.R
+│   │
+│   │  HOMD taxonomy / species-level assignment
+│   ├── setup_homd.R
+│   ├── homd_fast_taxonomy.R
+│   ├── homd_priority_taxonomy.R
+│   ├── run_homd_species.R
+│   ├── species_level_assignment.R
+│   │
+│   │  Additional utilities
+│   ├── assign_fecal_taxonomy.R
+│   ├── generate_manuscript_updates.py
+│   ├── run_fecal_and_combined_analysis.R
+│   │
+│   │  Corrected final-analysis scripts
+│   ├── run_ancombc2_phylum.R
+│   └── regenerate_combined.R
 │
 ├── dada2/                     # DADA2 pipeline outputs
 ├── data/                      # Cohort & sample-level data (CSV)
@@ -232,16 +271,49 @@ pip install -r requirements.txt
 ### Run order
 
 ```bash
+# ── 1. Download ────────────────────────────────────────────
 bash scripts/1_download_sra_data.sh
+bash scripts/download_and_process_fecal.sh          # fecal FASTQ download
+
+# ── 2. QC & Decontamination ───────────────────────────────
 bash scripts/2_run_fastp_automatic.sh
 bash scripts/3_run_cutadapt_v3v4.sh
 bash scripts/4_run_bowtie2_decontam.sh
+
+# ── 3. DADA2 ASV inference ────────────────────────────────
 Rscript scripts/5_dada2_16S_pipeline_standalone.R
+Rscript scripts/fecal_dada2_analysis.R              # fecal ASV processing
+
+# ── 4. Taxonomy & Abundance ──────────────────────────────
 Rscript scripts/6_abundance_analysis.R
+Rscript scripts/setup_homd.R                        # HOMD database setup
+Rscript scripts/homd_fast_taxonomy.R                # HOMD-based assignment
+Rscript scripts/species_level_assignment.R          # species-level refinement
+
+# ── 5. Sample selection & filtering ───────────────────────
+Rscript scripts/analyze_sample_selection.R
+Rscript scripts/identify_excluded_samples.R
+
+# ── 6. Diversity & Differential Abundance ─────────────────
 python scripts/7_alpha_beta_analysis.py
-python scripts/8_microbiome_ml.py
+Rscript scripts/improved_differential_analysis.R
+
+# ── 7. Functional prediction ──────────────────────────────
 python scripts/9_picrust.py
+python scripts/10_pathway-tools.py
+
+# ── 8. Machine learning ──────────────────────────────────
+python scripts/8_microbiome_ml.py
+
+# ── 9. Combined analysis & figures ────────────────────────
+Rscript scripts/run_fecal_and_combined_analysis.R
+Rscript scripts/regenerate_combined.R               # corrected 174-sample PCA
+Rscript scripts/run_ancombc2_phylum.R               # corrected phylum results
 ```
+
+> **Note:** The 22 additional scripts in `scripts/` include batch-processing helpers,
+> HOMD taxonomy pipelines, improved-analysis iterations, and corrected final-analysis
+> scripts used to produce the results in this repository.
 
 ---
 
