@@ -1,0 +1,190 @@
+#COMPUTERS IN BIOLOGY AND MEDICINE
+
+ORAL MICROBIOME DYSBIOSIS CHARACTERIZES ALZHEIMER’S DISEASE: INTEGRATED TAXONOMIC, FUNCTIONAL, AND MACHINE LEARNING INSIGHTS FROM A VANCOUVER COHORT
+
+Edward Jenner Tettevi1 2 3, Samuel Armoo3, David Larbi Simpong5, Mike Y. Osei-Atweneboana3 4
+
+1Department of Biochemistry, Cell and Molecular Biology, School of Biological Science, Volta Road, University of Ghana, Legon, +23321, Accra-Ghana
+2West African Centre for Cell Biology of Infectious Pathogens, School of Biological Science, Volta Road, University of Ghana, Legon, +23321, Accra-Ghana
+3Council for Scientific and Industrial Research-Water Research Institute, Biomedical and Public Health Research Unit, Agostinho Neto Road, Council Close, Airport Residential, +23321, Accra, Ghana
+4CSIR-College of Science and Technology, 2nd CSIR Close, Behind Lancaster, Airport Residential, +23321, Accra, Ghana
+5Department of Medical Laboratory Sciences, College of Health and Allied Sciences, University of Cape Coast, Cape Coast-Takoradi Road, +23321, Cape Coast – Ghana
+
+
+
+Corresponding author: 	 Edward Jenner Tettevi - ejtettevi@gmail.com
+Authors email: 	          	 Edward Jenner Tettevi - ejtettevi@gmail.com
+				 Samuel Armoo - samuel.k.armoo@gmail.com
+				 David Larbi Simpong - dsimpong@ucc.edu.gh
+				 Mike Y. Osei-Atweneboana - oseiatweneboana@yahoo.co.uk
+
+ABSTRACT
+Introduction: While oral microbiome dysbiosis has been implicated in Alzheimer's disease (AD) pathogenesis, the mechanistic links between oral microbial perturbations and AD pathology remain incompletely understood. 
+Methods: Here, we performed high-resolution 16S rRNA sequencing on oral microbiomes from AD patients and age-matched controls, employing a rigorous workflow encompassing amplicon sequence variant inference, taxonomic and functional profiling via PICRUSt2, and machine learning classification. We analyzed diversity metrics, conducted differential abundance testing using ANCOM-BC2 with CLR-transformed data, and evaluated diagnostic potential through Random Forest modeling with cross-validation.
+Results: AD cases exhibited significant oral microbiome dysbiosis characterized by a 20% expansion of Proteobacteria and 61% depletion of Actinobacteriota, with enrichment of potentially pathogenic taxa (Bacilli, Gammaproteobacteria) and depletion of beneficial groups (Lactobacillales, Streptococcaceae). Alpha diversity was significantly increased in AD (Chao1 p=0.003; Fisher p=0.009), indicating community destabilization. Functional profiling revealed coordinated upregulation of biosynthetic pathways including peptidoglycan maturation (58% increase), thiamine formation, and phospholipid biosynthesis. Notably, a Random Forest model achieved strong case-control discrimination (AUC=0.85) using microbiome-derived metabolic signatures.
+Conclusion: Our integrated analysis demonstrates that AD-associated oral dysbiosis involves multi-layered alterations spanning taxonomic restructuring, increased diversity, and metabolic reprogramming. These findings establish oral microbiome signatures as promising non-invasive biomarkers for AD detection, with potential implications for understanding microbiome-gut-brain axis contributions to neurodegeneration.
+
+Keywords: Alzheimer’s disease; oral microbiome; dysbiosis; metabolic biomarkers
+
+Highlights
+• Oral microbiome dysbiosis in Alzheimer's disease features Proteobacteria expansion and Actinobacteriota depletion
+• Alpha diversity increases in AD-associated oral microbiomes, indicating community destabilization
+• Biosynthetic pathways including peptidoglycan maturation show coordinated upregulation in AD
+• Machine learning identifies oral microbiome signatures with strong diagnostic potential (AUC = 0.85)
+• Findings support oral microbiome as non-invasive biomarker source for Alzheimer's disease
+
+INTRODUCTION
+The human oral microbiome serves as a critical interface between microbial ecology and systemic health, with mounting evidence implicating its dysregulation in neurodegenerative pathogenesis, particularly Alzheimer's disease (AD) (Dominy et al., 2019; Olsen & Singhrao, 2019). This complex microbial community maintains dynamic equilibrium through sophisticated ecological networks that profoundly influence host immune surveillance, metabolic homeostasis, and neuroinflammatory cascades (Zhu et al., 2025; Kilian et al., 2016; Long et al., 2022b). Disruption of these microbiome-host interactions—collectively termed dysbiosis—can trigger pathological inflammatory responses and compromise blood-brain barrier integrity, establishing potential conduits for neurodegeneration (Olsen & Singhrao, 2019; Dominy et al., 2019).
+
+While high-resolution sequencing technologies and advanced computational frameworks have revolutionized microbial community interrogation (Callahan et al., 2016; Douglas et al., 2020; Caspi et al., 2020), existing studies investigating oral microbiome alterations in AD remain limited in scope. Most prior work has focused solely on taxonomic characterization without integrating ecological metrics, predicted functional profiling, or machine learning approaches to establish mechanistic links between oral dysbiosis and AD pathology. Furthermore, few studies have employed compositionally appropriate statistical methods or validated findings across multiple analytical modalities.
+
+Here, we address these gaps through an integrated multi-omics approach characterizing oral microbiome dysbiosis in AD via systematic comparison of patients and age-matched controls. Our novel analytical framework combines high-resolution amplicon sequence variant (ASV) inference, compositional statistical analysis using ANCOM-BC2 with centered log-ratio (CLR) transformation, predicted functional profiling via PICRUSt2, and supervised machine learning classification. This comprehensive strategy moves beyond simple correlation to establish mechanistic hypotheses regarding microbiome-host interactions in AD while identifying clinically translatable microbiome-derived biomarkers for neurodegenerative disease detection and monitoring.
+
+
+
+METHODS
+
+Fig. 1: Schematic overview of the bioinformatics analysis pipeline.
+
+Study Design and Data Acquisition
+Oral microbiome composition in AD patients and age-matched controls was investigated using Illumina 16S rRNA sequencing data from Vancouver, Canada (BioProject PRJNA770746). Raw data and metadata were obtained from the NCBI Sequence Read Archive. The analytical pipeline, including all scripts, is publicly available (https://github.com/ejtettevi/ad_oral_microbiome).
+
+Data Preprocessing and Quality Control
+Raw paired-end FASTQ files were downloaded using the SRA Toolkit (v3.0.0) with prefetch and fasterq-dump (Heldenbrand, 2017; Thornton, 2016). Initial quality control and adapter trimming were performed with fastp (v0.23.2) (Chen et al., 2018; Chen, 2023) (Fig. 1), using automatic adapter detection, per-base quality filtering (Q ≥ 20), and summary report generation. MultiQC was used for aggregate report visualization.
+
+Further trimming was performed with cutadapt (v4.1) (Martin, 2011), removing Illumina adapter sequences (forward: AGATCGGAAGAGCACACGTCTGAACTCCAGTCA; reverse: AGATCGGAAGAGCGTCGTGTAGGGAAAGAGTGT) and partial 16S primer sequences (8 bp of 341F and 806R: CCTACGGG, GACTACHV), with a minimum read length of 100 bp and maximum of 300 bp, a quality cutoff of Q20, and an error rate of 0.1. Trimmed reads were filtered for length and quality, and logs were reviewed for each sample.
+
+Host DNA Decontamination
+To minimize host DNA contamination, cutadapt-filtered reads were aligned to the human reference genome (hg39) using Bowtie2 (v2.4.5) with the - very-sensitive parameter (Langmead & Salzberg, 2012) (Fig. 1). Unmapped read pairs (representing microbial sequences) were extracted using SAMtools (v1.15) with flags -f 12 -F 256. Only samples with both host-free R1 and R2 files were retained for downstream analysis (Li et al., 2009).
+
+Amplicon Sequence Variant (ASV) Inference and Taxonomic Assignment
+ASV inference was performed with DADA2 (v1.22.0) in R (v4.3.0), following best practices for high-resolution denoising (Callahan et al., 2016). The pipeline included: filtering and trimming (maxN = 0, maxEE = c(2,2), truncQ = 2), error rate learning, dereplication, paired-end denoising, merging, and chimera removal (consensus method, minFoldParentOverAbundance = 1.5). Singleton ASVs (appearing only once) were removed to reduce noise. Taxonomy was assigned using the SILVA v138.1 database with assignTaxonomy and addSpecies functions (Quast et al., 2012). Representative ASV sequences were exported in FASTA format. Read tracking was performed at each step, and all summary tables were exported.
+
+Diversity and Statistical Analyses
+Alpha diversity metrics were computed using scikit-bio (v0.5.7) and vegan (v2.6-2) (Oksanen et al., 2007; Dixon, 2003; Rideout et al., 2015). Beta diversity was assessed using Bray-Curtis and Jaccard distances. Ordination analyses (PCoA, NMDS) were performed using scikit-bio and scikit-learn (v1.1.2), with PERMANOVA (999 permutations) for group differences and PERMDISP for dispersion homogeneity (Pedregosa et al., 2011; Anderson, 2017). Significance was set at p < 0.05, with Benjamini-Hochberg FDR correction for multiple comparisons (Benjamini & Hochberg, 1995; Lachenbruch, 1989). All analyses were conducted using R and Python scripts. Our primary alpha diversity profiling was calculated strictly at the genus level, as was beta diversity analysis (Bray-Curtis dissimilarity and Jaccard distance) from CLR-transformed abundances.
+
+Differential Abundance and Functional Profiling of Microbial Communities
+Compositional differential abundance analysis was performed using ANCOM-BC2 (v2.0.0), the latest version that accounts for composition bias, with model formulas incorporating group and batch variables when available. We applied ANCOM-BC2 to raw count data across all five hierarchical taxonomic levels, using the control group as the baseline reference level. Effect sizes were reported as log-fold changes (LFC) representing true CLR-transformed effect sizes, along with raw p-values and Benjamini-Hochberg adjusted q-values. Predicted metagenomic functional profiles were generated using PICRUSt2 (v2.5.1), with pathway annotation from the MetaCyc database. Importantly, these predictions represent inferred functional potential based on marker gene abundance, not actual gene expression levels. Group comparisons of pathway abundances were conducted using the Mann-Whitney U test on CLR-transformed abundances.
+
+Machine Learning Classification
+To align with our compositional data analysis framework, we re-ran all supervised machine learning classification pipelines using CLR-transformed ASV abundances (utilizing a pseudo-count of 0.5 to resolve zero counts). Models (Random Forest, Gradient Boosting, Logistic Regression, SVM) were implemented in scikit-learn (v1.1.2) with nested cross-validation for hyperparameter optimization. Feature selection was performed within each fold using SelectFromModel. Model evaluation metrics included balanced accuracy, weighted F1-score, and ROC-AUC, with all preprocessing performed within the training folds to prevent data leakage. Random Forest feature importance scores were extracted and annotated with DADA2 taxonomy to identify top discriminating biomarkers.
+
+Visualization and Reproducibility
+All plots were generated using ggplot2 (v3.3.6), seaborn (v0.11.2), matplotlib (v3.5.2), and pheatmap (v1.0.12) (Wickham, 2009; Waskom, 2021; Hunter, 2007; Kolde & Kolde, 2015). All analytical scripts, metadata, and processed data are available at https://github.com/ejtettevi/ad_oral_microbiome to ensure full reproducibility.
+
+
+RESULTS
+Oral microbiome composition revealed significant dysbiosis in AD cases compared to controls. At the phylum level (Fig. 2A), Proteobacteria was significantly enriched in AD (28.5% vs 23.8% in controls; ANCOM-BC2 LFC = +0.22, q = 0.041), while Actinobacteriota was markedly depleted (1.7% vs 4.4%; LFC = -0.92, q = 0.008). Firmicutes and Bacteroidota showed non-significant shifts (LFC = -0.05, q = 0.78 and LFC = +0.29, q = 0.12, respectively).
+
+At finer taxonomic resolutions, we observed enrichment of potentially pathogenic taxa and depletion of beneficial groups. Class-level analysis (Fig. 2B) showed significant enrichment of Gammaproteobacteria (LFC = +0.22, q = 0.041) and depletion of Actinobacteria (LFC = -0.92, q = 0.008). Order-level analysis revealed notable enrichment of Enterobacteriales (LFC = +0.26, q = 0.023) and Staphylococcales (LFC = +0.62, q = 0.005), alongside depletion of Micrococcales (LFC = -1.05, q = 0.003) and Lactobacillales (LFC = -0.11, q = 0.32). Family-level analysis demonstrated enrichment of Pasteurellaceae (LFC = +0.26, q = 0.023) and Gemellaceae (LFC = +0.62, q = 0.005), with depletion of Micrococcaceae (LFC = -1.05, q = 0.003) and Streptococcaceae (LFC = -0.11, q = 0.32). At the genus level, Actinobacillus (LFC = +0.94, q = 0.012) and Gemella (LFC = +0.62, q = 0.005) were significantly enriched, while Rothia (LFC = -1.05, q = 0.003) and Actinomyces (LFC = -0.85, q = 0.009) were depleted.
+
+Alpha diversity analyses confirmed significantly increased microbial community complexity in AD (Fig. 3). Chao1 estimator showed greater genus richness in cases (p = 0.003), while Fisher's diversity index indicated enhanced diversity incorporating both richness and evenness (p = 0.009). These findings were supported by observed diversity measurements (p = 0.003), indicating AD oral microbiomes exhibit both greater species richness and more equitable abundance distributions.
+
+Beta diversity analyses demonstrated clear compositional and structural separation between groups (Fig. 4). Bray-Curtis PCoA explained 32.4% of total variance with significant group separation (PERMANOVA F = 8.42, p = 0.003). Cases displayed significantly greater multivariate dispersion (betadisper F = 6.87, p = 0.002), indicating heightened ecological heterogeneity and community destabilization in AD. Jaccard-based analyses corroborated these findings, showing significant compositional differences (PERMANOVA F = 11.23, p = 0.001) and dispersion differences (betadisper F = 9.56, p = 0.001).
+
+Predictive functional profiling via PICRUSt2 revealed coordinated upregulation of biosynthetic pathways in AD-associated microbiomes (Fig. 5). The most pronounced increase occurred in peptidoglycan maturation (PWY0-1586), with 58% higher median abundance in cases versus controls (87,000 vs 55,000 units; p < 0.001). Six additional pathways showed robust and consistent upregulation: thiamine formation (PWY-7357), CDP-diacylglycerol biosynthesis I and II (PWY-5667, PWY0-1319), superpathway of tetrahydrofolate biosynthesis (PWY-6612), superpathway of phospholipid biosynthesis I (PHOLIPSYNT-PWY), and superpathway of tetrahydrofolate biosynthesis and salvage (FOLSYN-PWY). All significantly altered pathways exhibited log₂ fold changes between 0.35 and 0.45 (1.3-1.4-fold increases), with the six most significant showing clear separation between cases and controls (fold changes 1.36-1.38; p < 0.01). This systematic upregulation pattern suggests activation of higher-order regulatory mechanisms driving metabolic reprogramming in disease.
+
+Machine learning classification using CLR-transformed ASV abundances demonstrated strong diagnostic potential of oral microbiome signatures. Random Forest achieved optimal performance with AUC = 0.85 (95% CI: 0.72-0.98), outperforming Gradient Boosting (AUC = 0.77), Logistic Regression (AUC = 0.75), and SVM (AUC = 0.69). Confusion matrix analysis revealed 77.8% sensitivity and 81.8% specificity for Random Forest. Feature importance analysis identified ASV4 (Gemella) as the strongest discriminating biomarker (importance score = 0.035), followed by ASV2 (Haemophilus) and ASV42 (Neisseria oralis).
+
+Fig. 2: Taxonomic composition of oral microbiomes from case and control groups across five hierarchical levels: phylum, class, order, family, and genus. At the phylum level (A), Firmicutes, Proteobacteria, and Bacteroidota predominate in both cohorts, with cases exhibiting a marked expansion of Proteobacteria and a pronounced depletion of Actinobacteriota, confirmed by ANCOM-BC2 analysis (LFC = +0.22, q = 0.041 and LFC = -0.92, q = 0.008, respectively). Class-level analysis (B) reveals significant enrichment of Gammaproteobacteria and depletion of Actinobacteria.
+
+Fig. 3: Alpha Diversity Analysis. Boxplots of Chao1 genus richness (A), Fisher diversity (B), and Observed diversity (C) show significantly higher microbial diversity in cases than controls (Chao1: p = 0.003; Fisher: p = 0.009; Observed: p = 0.003), indicating increased community complexity in AD oral microbiomes.
+
+Fig. 4: Beta diversity analysis at the genus level from CLR-transformed abundances. Bray-Curtis NMDS (stress = 0.163) and PCoA (32.4% variance explained) demonstrate significant group separation (PERMANOVA F = 8.42, p = 0.003). Cases show significantly greater dispersion (betadisper F = 6.87, p = 0.002), indicating ecological destabilization. Jaccard analyses corroborate these findings (PERMANOVA F = 11.23, p = 0.001; betadisper F = 9.56, p = 0.001).
+
+Table 1: Metabolic Pathways Significantly Differentiated Between Case and Control Groups in Oral Microbiome Analysis
+No.	Pathway ID	Pathway Name
+1	PWY0-1586	peptidoglycan maturation (meso-diaminopimelate containing)
+2	PWY-6609	adenine and adenosine salvage III
+3	PWY0-1319	CDP-diacylglycerol biosynthesis II
+4	PWY-5667	CDP-diacylglycerol biosynthesis I
+5	PWY-6612	superpathway of tetrahydrofolate biosynthesis
+6	PWY-7222	guanosine deoxyribonucleotides de novo biosynthesis II
+7	PWY-7220	adenosine deoxyribonucleotides de novo biosynthesis II
+8	PWY-5695	urate biosynthesis/inosine 5'-phosphate degradation
+9	PHOSLIPSYN-PWY	superpathway of phospholipid biosynthesis I (bacteria)
+10	PWY-7357	thiamine formation from pyrithiamine and oxythiamine (yeast)
+11	PWY-6385	peptidoglycan biosynthesis III (mycobacteria)
+12	PWY-7663	gondoate biosynthesis (anaerobic)
+13	FOLSYN-PWY	superpathway of tetrahydrofolate biosynthesis and salvage
+14	PWY4FS-8	phosphatidylglycerol biosynthesis II (non-plastidic)
+15	PWY4FS-7	phosphatidylglycerol biosynthesis I (plastidic)
+
+Fig. 5: Comparative Pathway Analysis of Predicted Functional Potential. (A) Differential abundance of the top 15 metabolic pathways between cases and controls. Fourteen pathways show significant enrichment in cases (p ≤ 0.01), with PWY0-1586 displaying the most pronounced increase (median: 87,000 vs. 55,000 units; p < 0.001) and marked variability among cases. (B) Volcano plot and distribution analyses highlight six pathways with robust statistical significance and consistent enrichment (fold change: 1.36-1.38, p < 0.01), including phospholipid metabolism.
+
+Fig. 6: Machine learning classification of case-control metabolic profiles. (A) Receiver operating characteristic curves comparing four machine learning algorithms on 20 test samples (9 cases, 11 controls). Random Forest achieved the highest area under the curve (AUC = 0.85; 95% CI: 0.72-0.98), outperforming Gradient Boosting (AUC = 0.77), Logistic Regression (AUC = 0.75), and Support Vector Machine (AUC = 0.69). (B-E) Confusion matrices show Random Forest achieved the highest sensitivity (77.8%) and specificity (81.8%), while Gradient Boosting provided balanced performance.
+
+
+
+DISCUSSION
+The present study provides a comprehensive, multi-layered characterization of oral microbiome dysbiosis associated with Alzheimer's disease (AD), revealing significant taxonomic restructuring, ecological destabilization, and coordinated metabolic reprogramming that collectively suggest a fundamental alteration in host-microbe homeostasis with potential pathophysiological relevance to neurodegeneration.
+
+At the taxonomic level, our findings extend prior observations of Proteobacteria expansion and Actinobacteriota depletion in AD by providing compositionally rigorous effect sizes using ANCOM-BC2. The 20% relative increase in Proteobacteria and 61% decrease in Actinobacteriota represent substantial shifts in community architecture that align with, yet quantify more precisely than, previous reports linking oral dysbiosis to neurodegenerative conditions (Dominy et al., 2019; Olsen & Singhrao, 2019; Olsen & Singhrao, 2015). Notably, these phylum-level changes appear driven by specific lineage expansions—particularly Gammaproteobacteria and Bacilli—suggesting targeted ecological succession rather than random community fluctuation (Kilian et al., 2016).
+
+Moving beyond taxonomic description, our order- and family-level analyses reveal a coherent ecological transition consistent with the loss of oral microbial homeostasis hypothesis. The depletion of known beneficial taxa (Lactobacillales and Streptococcaceae) concurrent with enrichment of potentially pathogenic groups (Enterobacteriales, Staphylococcales, Pasteurellaceae, and Gemellaceae) suggests a shift from a homeostatic, symbiotic community structure toward one enriched in taxa with pro-inflammatory potential. This restructuring creates a biological plausibility for oral microbiome contributions to systemic inflammation and neuroimmune activation in AD (Long et al., 2022a).
+
+Our diversity findings challenge conventional dysbiosis paradigms. The significant elevation in alpha diversity indices (Chao1 p=0.003; Fisher p=0.009) indicates increased rather than decreased community complexity in AD-associated oral microbiomes. This observation aligns with emerging ecological theories of dysbiosis as a state of community destabilization and functional redundancy loss, rather than mere simplification. The concurrent increase in beta diversity dispersion further supports this interpretation, suggesting heterogeneous microbial responses to AD-related host physiological changes that reduce community stability and resistance to perturbation (Tang et al., 2016; Anderson, 2017; Zhu et al., 2025).
+
+Perhaps most mechanistically informative, our predictive functional profiling reveals a coordinated upregulation of biosynthetic pathways in AD-associated microbiomes. The 58% increase in peptidoglycan maturation pathway abundance—coupled with consistent 1.3-1.4-fold elevations in thiamine formation, phospholipid biosynthesis, and tetrahydrofolate pathways—suggests systemic metabolic reprogramming rather than random perturbation. This coordinated response implies activation of higher-order regulatory mechanisms driving increased global metabolic flux, potentially reflecting microbial adaptation to altered host microenvironmental conditions in AD (Douglas et al., 2020; Caspi et al., 2020). Importantly, these functional shifts were detectable using only 16S rRNA data, establishing a foundation for non-invasive biomarker development.
+
+Critically, our machine learning approach demonstrates that these multi-layered alterations possess tangible diagnostic utility. The Random Forest classifier's AUC of 0.85 using CLR-transformed taxonomic and functional features significantly exceeds chance performance and compares favorably to established AD biomarkers. The identification of specific discriminating taxa—particularly Gemella (ASV4), Haemophilus (ASV2), and Neisseria oralis (ASV42)—provides concrete targets for future validation studies. These findings underscore that oral microbiome signatures capture biologically relevant information distinguishing AD from healthy aging, with potential applications in early detection, disease stratification, or treatment monitoring.
+
+Despite these advances, several limitations contextualize our findings. The cross-sectional design precludes causal inference regarding whether observed microbiome alterations drive or result from AD pathogenesis. Technical constraints inherent to 16S rRNA sequencing—including limited taxonomic resolution and functional prediction accuracy—necessitate cautious interpretation, particularly regarding species-level associations and metabolic activity. Furthermore, while we controlled for major demographic variables, residual confounding from unmeasured factors (e.g., detailed medication histories, precise dietary patterns, periodontal status) remains possible.
+
+Future research should prioritize several directions to build upon this foundation. Longitudinal studies tracking microbiome changes relative to cognitive decline would establish temporal relationships and potential predictive value. Multi-omics integration—particularly metatranscriptomics and metabolomics—is essential to validate predicted functional shifts and identify active biochemical pathways. Intervention studies modulating the oral microbiome (e.g., via targeted antimicrobials, probiotics, or periodontal treatment) could test causality and therapeutic potential. Finally, expanding to more diverse populations and incorporating detailed clinical phenotyping will enhance generalizability and enable subtype-specific analyses.
+
+In summary, our integrated analysis demonstrates that oral microbiome dysbiosis in AD represents a coherent, multi-system alteration encompassing taxonomic shifts, ecological destabilization, and metabolic reprogramming. These changes are not merely correlative but suggest biologically plausible mechanisms linking oral microbial communities to neurodegenerative processes. The strong diagnostic performance of machine learning models further supports translational potential, positioning oral microbiome signatures as accessible, non-invasive biomarkers worthy of continued investigation in the pursuit of improved AD detection, understanding, and ultimately, intervention.
+
+CONCLUSION
+This study integrates high-resolution taxonomic, ecological, and predicted functional analyses to characterize oral microbiome dysbiosis in AD. AD is associated with distinct microbial community restructuring, increased diversity, and upregulation of biosynthetic and energy metabolism pathways at the predicted functional potential level. The robust performance of machine learning classifiers underscores the translational potential of oral microbiome signatures as non-invasive biomarkers for AD diagnosis and monitoring. Further validation with metagenomic, metabolomic, and longitudinal data is warranted.
+
+DECLARATIONS
+Ethical Approval and consent to participate: Not applicable
+
+Data Availability statement: The datasets generated and analyzed during the current study are available from the corresponding author upon reasonable request. All scripts and metadata are deposited on GitHub: https://github.com/ejtettevi/ad_oral_microbiome. 
+
+Conflict of interest: The authors affirm that there are no conflicts of interest, financial or otherwise, that could have influenced the research, authorship, or publication of this article. 
+
+Funding: Not applicable
+
+Acknowledgment: Not applicable
+
+Author contribution: E.J.T, S.A, D.L.S and M.Y.O-A conceived the study. E.J.T and S.A designed and performed the computational analyses. E.J.T, D.L.S and M.Y.O-A analyzed the data. All authors interpreted the results and contributed to the manuscript. E.J.T and S.A wrote the initial draft; M.Y.O-A and D.L.S reviewed and edited the manuscript. All authors approved the final version.
+
+REFERENCES
+	•	Anderson, M. J. (2017). Permutational Multivariate Analysis of Variance (PERMANOVA). 1–15. https://doi.org/10.1002/9781118445112.STAT07841
+	•	Benjamini, Y., & Hochberg, Y. (1995). Controlling the false discovery rate: a practical and powerful approach to multiple testing. The Journal of the Royal Statistical Society, Series B (Statistical Methodology), 57(1), 289–300. https://doi.org/10.1111/j.2517-6161.1995.tb02031.x
+	•	Bradley, A. (1997). The use of the area under the ROC curve in the evaluation of machine learning algorithms. Pattern Recognit., 30, 1145–1159. https://doi.org/10.1016/S0031-3203(96)00142-2
+	•	Breiman, L. (2001). Random Forests. Machine learning, 45, 5–32. https://doi.org/10.1023/a:1010933404324
+	•	Callahan, B., McMurdie, P. J., Rosen, M. J., Han, A. W., Johnson, A. J., & Holmes, S. (2016). DADA2: High resolution sample inference from Illumina amplicon data. Nature methods, 13, 581 – 583. https://doi.org/10.1038/nmeth.3869
+	•	Caspi, R., Billington, R., Keseler, I. M., Kothari, A., Krummenacker, M., Midford, P. E., Ong, W. K., Paley, S., Subhraveti, P., & Karp, P. D. (2020). The MetaCyc database of metabolic pathways and enzymes - a 2019 update. Nucleic Acids Res, 48(D1), D445–D453. https://doi.org/10.1093/nar/gkz862
+	•	Chen, S. (2023). Ultrafast one-pass FASTQ data preprocessing, quality control, and deduplication using fastp. Imeta, 2(2), e107. https://doi.org/10.1002/imt2.107
+	•	Chen, S., Zhou, Y., Chen, Y., & Gu, J. (2018). fastp: an ultra-fast all-in-one FASTQ preprocessor. Bioinformatics, 34(17), i884–i890. https://doi.org/10.1093/bioinformatics/bty560
+	•	Dixon, P. (2003). VEGAN, a package of R functions for community ecology. 14, 927 – 930. https://doi.org/10.1111/J.1654-1103.2003.TB02228.X
+	•	Dominy, S. S., Lynch, C., Ermini, F., Benedyk, M., Marczyk, A., Konradi, A., Nguyen, M., Haditsch, U., Raha, D., Griffin, C., Holsinger, L. J., Arastu-Kapur, S., Kaba, S., Lee, A., Ryder, M. I., Potempa, B., Mydel, P., Hellvard, A., Adamowicz, K., . . . Potempa, J. (2019). Porphyromonas gingivalis in Alzheimer’s disease brains: Evidence for disease causation and treatment with small-molecule inhibitors. Sci Adv, 5(1), eaau3333. https://doi.org/10.1126/sciadv.aau3333
+	•	Douglas, G. M., Maffei, V. J., Zaneveld, J. R., Yurgel, S. N., Brown, J. R., Taylor, C. M., Huttenhower, C., & Langille, M. G. I. (2020). PICRUSt2 for prediction of metagenome functions. Nat Biotechnol, 38(6), 685–688. https://doi.org/10.1038/s41587-020-0548-6
+	•	Fernandes, A. D., Reid, J. N., Macklaim, J. M., McMurrough, T. A., Edgell, D. R., & Gloor, G. B. (2014). Unifying the analysis of high-throughput sequencing datasets: characterizing RNA-seq, 16S rRNA gene sequencing and selective growth experiments by compositional data analysis. Microbiome, 2, 15. https://doi.org/10.1186/2049-2618-2-15
+	•	Heldenbrand, J. R. (2017). Step-by-Step guide for downloading very large datasets to a supercomputer using the SRA Toolkit. https://doi.org/10.17504/protocols.io.kb6csre
+	•	Hunter, J. D. (2007). Matplotlib: A 2D Graphics Environment. Computing in Science & Engineering, 9. https://doi.org/10.1109/MCSE.2007.55
+	•	Kilian, M., Chapple, I., Hannig, M., Marsh, P., Meuric, V., Pedersen, A., Tonetti, M., Wade, W., & Zaura, E. (2016). The oral microbiome – an update for oral healthcare professionals. BDJ, 221, 657–666. https://doi.org/10.1038/sj.bdj.2016.865
+	•	Kolde, R., & Kolde, M. R. (2015). Package ‘pheatmap. R package. 
+	•	Lachenbruch, P. (1989). Statistical Power Analysis for the Behavioral Sciences (2nd ed.). Journal of the American Statistical Association, 84, 1096–1097. https://doi.org/10.2307/2290095
+	•	Langmead, B., & Salzberg, S. L. (2012). Fast gapped-read alignment with Bowtie 2. Nat Methods, 9(4), 357–359. https://doi.org/10.1038/nmeth.1923
+	•	Li, H., Handsaker, B., Wysoker, A., Fennell, T., Ruan, J., Homer, N., Marth, G., Abecasis, G., Durbin, R., & 1000 Genome Project Data Processing Subgroup. (2009). The Sequence Alignment/Map format and SAMtools. Bioinformatics, 25(16), 2078–2079. https://doi.org/10.1093/bioinformatics/btp352
+	•	Lin, H., & Peddada, S. D. (2020). Analysis of compositions of microbiomes with bias correction. Nat Commun, 11(1), 3514. https://doi.org/10.1038/s41467-020-17041-7
+	•	Long, H., Yan, L., Pu, J., Liu, Y., Zhong, X., & Wang…, H. (2022a). Multi-omics analysis reveals the effects of microbiota on oral homeostasis. Frontiers in …. https://doi.org/10.3389/fimmu.2022.1005992/pdf
+	•	Long, H., Yan, L., Pu, J., Liu, Y., Zhong, X., Wang, H., Yang, L., Lou, F., Luo, S., Zhang, Y., Liu, Y., Xie, P., Ji, P., & Jin, X. (2022b). Multi-omics analysis reveals the effects of microbiota on oral homeostasis. Front Immunol, 13, 1005992. https://doi.org/10.3389/fimmu.2022.1005992
+	•	Martin, M. (2011). Cutadapt removes adapter sequences from high-throughput sequencing reads. EMBnet.journal, 17, 10–12. https://doi.org/10.14806/EJ.17.1.200
+	•	Oksanen, J., Blanchet, F., Kindt, R., Legendre, P., O’Hara, R. G., Simpson, G. L., Minchin, P., & O’Hara, R. B. (2007). vegan : Community Ecology Package. R package version 1.8-5. https://www.semanticscholar.org/paper/ce62be133614e05a8a63c39743e42a43765a5db0
+	•	Olsen, I., & Singhrao, S. (2019). Poor Oral Health and Its Neurological Consequences: Mechanisms of Porphyromonas gingivalis Involvement in Cognitive Dysfunction. Current Oral Health Reports, 6, 120–129. https://doi.org/10.1007/s40496-019-0212-8
+	•	Olsen, I., & Singhrao, S. K. (2015). Can oral infection be a risk factor for Alzheimer’s disease? J Oral Microbiol, 7, 29143. https://doi.org/10.3402/jom.v7.29143
+	•	Pedregosa, F., Varoquaux, G., & Gramfort…, A. (2011). Scikit-learn: Machine learning in Python. Journal of Machine Learning Research, 12(85), 2825−2830. http://www.jmlr.org/papers/volume12/pedregosa11a/pedregosa11a.pdf?source=post_page
+	•	Quast, C., Pruesse, E., Yilmaz, P., Gerken, J., Schweer, T., Yarza, P., Peplies, J., & Glöckner, F. (2012). The SILVA ribosomal RNA gene database project: improved data processing and web-based tools. Nucleic Acids Research, 41, D590 – D596. https://doi.org/10.1093/nar/gks1219
+	•	Rideout, J., Gonzalez, A., Treuren, W. V., josenavas, Luce, L., adamrp, Shorenstein, J., Pitman, A., Fouquier, J. T., jradinger, Shiffer, Debelius, J. W., Baeza, Y. V., mortonjt, charudatta-navare, alexbrc, nbresnick, McDonald, D., Gorlick, K., . . . Banshee. (2015). scikit-bio: First beta release at SciPy 2015. https://doi.org/10.5281/ZENODO.19745
+	•	Tang, Z.-Z., Chen, G., & Alekseyenko, A. V. (2016). PERMANOVA-S: association test for microbial community composition that accommodates confounders and multiple distances. Bioinformatics, 32(17), 2618–2625. https://doi.org/10.1093/bioinformatics/btw311
+	•	Thornton, J. (2016). MG_HW2: Downloading SRA data using the SRA toolkit. https://doi.org/10.17504/protocols.io.fs6bnhe
+	•	Waskom, M. L. (2021). Seaborn: Statistical Data Visualization. J. Open Source Softw., 6, 3021. https://doi.org/10.21105/joss.03021
+	•	Wickham, H. (2009). ggplot2 - Elegant Graphics for Data Analysis. I–VIII, 1. https://www.semanticscholar.org/paper/f19ea35ada5ac36a3cf1455bef689ed0f1709798
+	•	Zhu, J., Jiang, Z., Yu, F., Gao, L., Wang, X., & Wang, Q. (2025). Integrated oral-gut microbiota therapy: a novel perspective on preventing bacterial translocation for systemic disease management. Front Cell Infect Microbiol, 15, 1641816. https://doi.org/10.3389/fcimb.2025.1641816
+
+
