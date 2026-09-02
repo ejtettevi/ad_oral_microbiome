@@ -1,6 +1,6 @@
 Sample_Type,Included,Group,N,Age (Mean ± SD),Sex (% Female),BMI (Mean ± SD),MoCA (Mean ± SD)
-Oral,Yes,Control,53,69.8 ± 6.1,32.1%,28.16 ± 6.20,26.5 ± 2.2
-Oral,Yes,Case,45,71.4 ± 8.2,33.3%,25.53 ± 3.79,16.8 ± 5.8
+Oral,Yes,Control,53,69.6 ± 6.1,32.1%,28.47 ± 6.18,26.5 ± 2.3
+Oral,Yes,Case,43,71.6 ± 7.9,32.6%,25.69 ± 3.77,16.8 ± 6.0
 Oral,No,Control,1,67.0,100.0%,35.98,30.0
 Fecal,Yes,Control,46,70.5 ± 5.6,30.4%,28.09 ± 6.26,26.3 ± 2.3
 Fecal,Yes,Case,32,70.3 ± 8.5,34.4%,25.32 ± 4.10,16.4 ± 5.9
