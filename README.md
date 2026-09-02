@@ -62,20 +62,24 @@ function, and diagnostic prediction to Alzheimer's disease._
 
 ```
  raw FASTQ (SRA)
-     │  1_download_sra_data.sh
+     │  01_download_sra_data.sh + 02_download_and_process_fecal.sh
      ▼
- Quality Control ─────────── 2_run_fastp_automatic.sh  (fastp, Q≥20)
-     │                       3_run_cutadapt_v3v4.sh     (adapters, primers)
+ Quality Control ─────────── 03_run_fastp_automatic.sh  (fastp, Q≥20)
+     │                       04_run_cutadapt_v3v4.sh     (adapters, primers)
      ▼
- Host Decontamination ────── 4_run_bowtie2_decontam.sh  (hg38; bowtie2, samtools)
+ Host Decontamination ────── 05_run_bowtie2_decontam.sh  (hg38; bowtie2, samtools)
      │
      ▼
- ASV Inference ───────────── 5_dada2_16S_pipeline_standalone.R  (DADA2, SILVA v138.1, HOMD)
+ ASV Inference ───────────── 06_dada2_16S_pipeline_standalone.R (+ 07–10 fecal DADA2, batch)
      │
-     ├──► Taxonomy & Abundance ── 6_abundance_analysis.R
-     ├──► Alpha/Beta Diversity ── 7_alpha_beta_analysis.py   (vegan, scikit-bio)
-     ├──► Function (PICRUSt2) ──── 9_picrust.py
-     └──► Machine Learning ─────── 8_microbiome_ml.py        (scikit-learn)
+     ├──► HOMD Taxonomy ───────── 11_setup_homd.R → 16_assign_fecal_taxonomy.R
+     ├──► Sample Selection ────── 17_analyze_sample_selection.R
+     ├──► Abundance ───────────── 19_abundance_analysis.R
+     ├──► Alpha/Beta Diversity ── 20_alpha_beta_analysis.py   (vegan, scikit-bio)
+     ├──► Differential ────────── 21_improved_differential_analysis.R
+     ├──► Function (PICRUSt2) ──── 27_picrust.py + 28_pathway-tools.py
+     ├──► Machine Learning ─────── 29_microbiome_ml.py        (scikit-learn)
+     └──► Combined & Corrected ── 32_run_fecal_and_combined_analysis.R → 34_run_ancombc2_phylum.R
 ```
 
 ---
@@ -117,55 +121,61 @@ ad_oral_microbiome/
 ├── requirements.txt           Python dependencies
 ├── sample_metadata.csv        Sample metadata for all runs
 │
-├── scripts/                   # All 36 analysis scripts used
+├── scripts/                  # 36 scripts — sequential execution order
 │   │
-│   │  Core pipeline (numbered)
-│   ├── 1_download_sra_data.sh
-│   ├── 2_run_fastp_automatic.sh
-│   ├── 3_run_cutadapt_v3v4.sh
-│   ├── 4_run_bowtie2_decontam.sh
-│   ├── 5_dada2_16S_pipeline_standalone.R
-│   ├── 6_abundance_analysis.R
-│   ├── 7_alpha_beta_analysis.py
-│   ├── 8_microbiome_ml.py
-│   ├── 9_picrust.py
-│   ├── 10_pathway-tools.py
+│   │  01–02  Data acquisition
+│   ├── 01_download_sra_data.sh
+│   ├── 02_download_and_process_fecal.sh
 │   │
-│   │  Fecal processing
-│   ├── download_and_process_fecal.sh
-│   ├── process_fecal_samples.R
-│   ├── process_fecal_batch.R
-│   ├── fecal_analysis_status.R
-│   ├── fecal_dada2_analysis.R
-│   ├── fecal_dada2_simple.R
-│   ├── combined_analysis.R
+│   │  03–05  QC & decontamination
+│   ├── 03_run_fastp_automatic.sh
+│   ├── 04_run_cutadapt_v3v4.sh
+│   ├── 05_run_bowtie2_decontam.sh
 │   │
-│   │  (Batch) improved analyses
-│   ├── analyze_sample_selection.R
-│   ├── identify_excluded_samples.R
-│   ├── run_improved_analysis.R
-│   ├── improved_analysis_clean.R
-│   ├── improved_analysis_final.R
-│   ├── improved_analysis_v2.R
-│   ├── improved_differential_analysis.R
-│   ├── improved_visualization.R
-│   ├── full_analysis.R
+│   │  06–10  DADA2 ASV inference
+│   ├── 06_dada2_16S_pipeline_standalone.R
+│   ├── 07_fecal_dada2_simple.R
+│   ├── 08_fecal_dada2_analysis.R
+│   ├── 09_process_fecal_samples.R
+│   ├── 10_process_fecal_batch.R
 │   │
-│   │  HOMD taxonomy / species-level assignment
-│   ├── setup_homd.R
-│   ├── homd_fast_taxonomy.R
-│   ├── homd_priority_taxonomy.R
-│   ├── run_homd_species.R
-│   ├── species_level_assignment.R
+│   │  11–16  HOMD taxonomy
+│   ├── 11_setup_homd.R
+│   ├── 12_homd_fast_taxonomy.R
+│   ├── 13_homd_priority_taxonomy.R
+│   ├── 14_run_homd_species.R
+│   ├── 15_species_level_assignment.R
+│   ├── 16_assign_fecal_taxonomy.R
 │   │
-│   │  Additional utilities
-│   ├── assign_fecal_taxonomy.R
-│   ├── generate_manuscript_updates.py
-│   ├── run_fecal_and_combined_analysis.R
+│   │  17–18  Sample selection
+│   ├── 17_analyze_sample_selection.R
+│   ├── 18_identify_excluded_samples.R
 │   │
-│   │  Corrected final-analysis scripts
-│   ├── run_ancombc2_phylum.R
-│   └── regenerate_combined.R
+│   │  19–26  Abundance, diversity & differential
+│   ├── 19_abundance_analysis.R
+│   ├── 20_alpha_beta_analysis.py
+│   ├── 21_improved_differential_analysis.R
+│   ├── 22_run_improved_analysis.R
+│   ├── 23_improved_analysis_clean.R
+│   ├── 24_improved_analysis_final.R
+│   ├── 25_improved_analysis_v2.R
+│   ├── 26_full_analysis.R
+│   │
+│   │  27–29  Functional & ML
+│   ├── 27_picrust.py
+│   ├── 28_pathway-tools.py
+│   ├── 29_microbiome_ml.py
+│   │
+│   │  30–34  Combined & corrected analyses
+│   ├── 30_combined_analysis.R
+│   ├── 31_fecal_analysis_status.R
+│   ├── 32_run_fecal_and_combined_analysis.R
+│   ├── 33_regenerate_combined.R
+│   ├── 34_run_ancombc2_phylum.R
+│   │
+│   │  35–36  Visualization & manuscript
+│   ├── 35_improved_visualization.R
+│   └── 36_generate_manuscript_updates.py
 │
 ├── dada2/                     # DADA2 pipeline outputs
 ├── data/                      # Cohort & sample-level data (CSV)
@@ -268,47 +278,64 @@ pip install -r requirements.txt
 - **Taxonomy:** `dada2/asv_taxonomy.tsv`
 - **Metadata:** `sample_metadata.csv`
 
-### Run order
+### Run order — sequential `01` → `36`
 
 ```bash
-# ── 1. Download ────────────────────────────────────────────
-bash scripts/1_download_sra_data.sh
-bash scripts/download_and_process_fecal.sh          # fecal FASTQ download
+# ── 01–02  Download ───────────────────────────────────────
+bash scripts/01_download_sra_data.sh
+bash scripts/02_download_and_process_fecal.sh
 
-# ── 2. QC & Decontamination ───────────────────────────────
-bash scripts/2_run_fastp_automatic.sh
-bash scripts/3_run_cutadapt_v3v4.sh
-bash scripts/4_run_bowtie2_decontam.sh
+# ── 03–05  QC & decontamination ───────────────────────────
+bash scripts/03_run_fastp_automatic.sh
+bash scripts/04_run_cutadapt_v3v4.sh
+bash scripts/05_run_bowtie2_decontam.sh
 
-# ── 3. DADA2 ASV inference ────────────────────────────────
-Rscript scripts/5_dada2_16S_pipeline_standalone.R
-Rscript scripts/fecal_dada2_analysis.R              # fecal ASV processing
+# ── 06–10  DADA2 ASV inference ────────────────────────────
+Rscript scripts/06_dada2_16S_pipeline_standalone.R
+Rscript scripts/07_fecal_dada2_simple.R
+Rscript scripts/08_fecal_dada2_analysis.R
+Rscript scripts/09_process_fecal_samples.R
+Rscript scripts/10_process_fecal_batch.R
 
-# ── 4. Taxonomy & Abundance ──────────────────────────────
-Rscript scripts/6_abundance_analysis.R
-Rscript scripts/setup_homd.R                        # HOMD database setup
-Rscript scripts/homd_fast_taxonomy.R                # HOMD-based assignment
-Rscript scripts/species_level_assignment.R          # species-level refinement
+# ── 11–16  HOMD taxonomy ─────────────────────────────────
+Rscript scripts/11_setup_homd.R
+Rscript scripts/12_homd_fast_taxonomy.R
+Rscript scripts/13_homd_priority_taxonomy.R
+Rscript scripts/14_run_homd_species.R
+Rscript scripts/15_species_level_assignment.R
+Rscript scripts/16_assign_fecal_taxonomy.R
 
-# ── 5. Sample selection & filtering ───────────────────────
-Rscript scripts/analyze_sample_selection.R
-Rscript scripts/identify_excluded_samples.R
+# ── 17–18  Sample selection ───────────────────────────────
+Rscript scripts/17_analyze_sample_selection.R
+Rscript scripts/18_identify_excluded_samples.R
 
-# ── 6. Diversity & Differential Abundance ─────────────────
-python scripts/7_alpha_beta_analysis.py
-Rscript scripts/improved_differential_analysis.R
+# ── 19–26  Abundance, diversity & differential ────────────
+Rscript scripts/19_abundance_analysis.R
+python  scripts/20_alpha_beta_analysis.py
+Rscript scripts/21_improved_differential_analysis.R
+Rscript scripts/22_run_improved_analysis.R
+Rscript scripts/23_improved_analysis_clean.R
+Rscript scripts/24_improved_analysis_final.R
+Rscript scripts/25_improved_analysis_v2.R
+Rscript scripts/26_full_analysis.R
 
-# ── 7. Functional prediction ──────────────────────────────
-python scripts/9_picrust.py
-python scripts/10_pathway-tools.py
+# ── 27–28  Functional prediction ──────────────────────────
+python scripts/27_picrust.py
+python scripts/28_pathway-tools.py                  # optional Pathway Tools
 
-# ── 8. Machine learning ──────────────────────────────────
-python scripts/8_microbiome_ml.py
+# ── 29     Machine learning ──────────────────────────────
+python scripts/29_microbiome_ml.py
 
-# ── 9. Combined analysis & figures ────────────────────────
-Rscript scripts/run_fecal_and_combined_analysis.R
-Rscript scripts/regenerate_combined.R               # corrected 174-sample PCA
-Rscript scripts/run_ancombc2_phylum.R               # corrected phylum results
+# ── 30–34  Combined & corrected analyses ─────────────────
+Rscript scripts/30_combined_analysis.R
+Rscript scripts/31_fecal_analysis_status.R
+Rscript scripts/32_run_fecal_and_combined_analysis.R
+Rscript scripts/33_regenerate_combined.R            # corrected 174-sample PCA
+Rscript scripts/34_run_ancombc2_phylum.R            # corrected phylum q=0.037
+
+# ── 35–36  Visualization & manuscript ────────────────────
+Rscript scripts/35_improved_visualization.R
+python  scripts/36_generate_manuscript_updates.py
 ```
 
 > **Note:** The 22 additional scripts in `scripts/` include batch-processing helpers,
