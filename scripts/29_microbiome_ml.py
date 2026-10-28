@@ -78,7 +78,10 @@ if zero_sum_samples.any():
 
 asv_table_normalized = asv_table_df.div(asv_table_df.sum(axis=1), axis=0)
 
-common_samples = list(set(asv_table_normalized.index) & set(metadata_df.index))
+# Deterministic sample ordering: sorting the intersection guarantees the same
+# sample order (and therefore the same train/test split, CV folds and figures)
+# on every run; set iteration order is hash-dependent and not reproducible.
+common_samples = sorted(set(asv_table_normalized.index) & set(metadata_df.index))
 dropped_samples = set(asv_table_normalized.index).symmetric_difference(metadata_df.index)
 print(f"Retained {len(common_samples)} samples. Dropped {len(dropped_samples)} samples.")
 if len(common_samples) == 0:
