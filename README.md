@@ -28,6 +28,7 @@ function, and diagnostic prediction to Alzheimer's disease._
 - 🧠 **PICRUSt2** predicted functional profiling (biosynthetic pathways enriched in AD)
 - 🤖 **Random Forest** classifier reaching **AUC = 0.86** (95% CI 0.65–1.00)
 - ⚖️ Fully reproducible end-to-end workflow (Python + R, conda + pip)
+- ✅ Repository cleaned: obsolete figure files removed (commit #3)
 
 ---
 
@@ -225,10 +226,6 @@ ad_oral_microbiome/
 
 | File | Figure |
 |---|---|
-| `Fig. 2.eps` / `Fig. 2.jpg` | PCoA + ANCOM-BC2 log-fold changes (vector EPS) |
-| `Fig. 3.jpg` | Chao1 / Fisher / Observed alpha diversity |
-| `Fig. 4.jpg` | Beta diversity (NMDS / PCoA) |
-| `Fig. 5.jpg` | PICRUSt2 pathway analysis |
 | `Fig_8_combined_pca.png` | **Combined oral+fecal PCA (174 samples)** |
 
 ### Supplementary Figures — `figures/`
