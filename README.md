@@ -11,7 +11,7 @@
 [![R](https://img.shields.io/badge/R-4.3-276DC3?style=flat-square&logo=r&logoColor=white)]()
 [![License](https://img.shields.io/badge/License-MIT-green?style=flat-square)]()
 [![16S](https://img.shields.io/badge/Amplicon-16S%20rRNA-blueviolet?style=flat-square)]()
-[![ML](https://img.shields.io/badge/AUC-0.85-FF6F00?style=flat-square)]()
+[![ML](https://img.shields.io/badge/AUC-0.86-FF6F00?style=flat-square)]()
 
 _A reproducible 16S rRNA amplicon metagenomics pipeline linking oral microbiome structure,
 function, and diagnostic prediction to Alzheimer's disease._
@@ -26,7 +26,7 @@ function, and diagnostic prediction to Alzheimer's disease._
 - 🧬 **96 oral** (43 AD / 53 control) + **78 fecal** (32 AD / 46 control) = **174 samples analysed**
 - 💊 **ANCOM-BC2** compositional differential-abundance testing across 5 taxonomic ranks
 - 🧠 **PICRUSt2** predicted functional profiling (biosynthetic pathways enriched in AD)
-- 🤖 **Random Forest** classifier reaching **AUC = 0.85** (95% CI 0.72–0.98)
+- 🤖 **Random Forest** classifier reaching **AUC = 0.86** (95% CI 0.65–1.00)
 - ⚖️ Fully reproducible end-to-end workflow (Python + R, conda + pip)
 
 ---
@@ -40,7 +40,7 @@ function, and diagnostic prediction to Alzheimer's disease._
 | **Genus markers** | `SUP05`, `Gemella`, `Fusobacterium` ↑; `F0332`, `Selenomonas` ↓ | significant |
 | **Alpha diversity** | Increased in AD (community destabilization) | Chao1 p = 0.003 |
 | **Functional potential** | Biosynthetic pathways ↑ (peptidoglycan, thiamine, phospholipid) | 58% rise |
-| **Diagnostic ML** | Random Forest **AUC 0.85** | sens. 77.8%, spec. 81.8% |
+| **Diagnostic ML** | Random Forest **AUC 0.86** | sens. 77.8%, spec. 81.8% |
 
 ---
 
@@ -229,9 +229,6 @@ ad_oral_microbiome/
 | `Fig. 3.jpg` | Chao1 / Fisher / Observed alpha diversity |
 | `Fig. 4.jpg` | Beta diversity (NMDS / PCoA) |
 | `Fig. 5.jpg` | PICRUSt2 pathway analysis |
-| `Fig._6A.png` | ML ROC curves (all models) |
-| `Fig._6B.png` | Confusion matrices |
-| `Fig._7.png` | Random Forest feature importance |
 | `Fig_8_combined_pca.png` | **Combined oral+fecal PCA (174 samples)** |
 
 ### Supplementary Figures — `figures/`
